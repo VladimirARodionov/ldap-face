@@ -63,7 +63,7 @@ function LoginForm() {
         <Form.Control
           value={form.password}
           data-testid="password-field"
-          minLength="8"
+          minLength="4"
           onChange={(e) => setForm({ ...form, password: e.target.value })}
           required
           type="password"
