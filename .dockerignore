@@ -1,0 +1,14 @@
+.gitignore
+.git
+venv/
+.venv/
+__pycache__/
+**/__pycache__/
+.idea/
+**/.idea/
+*.iml
+Dockerfile_app
+.env.dev
+*.log
+logs.log.*
+frontend
