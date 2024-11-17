@@ -27,7 +27,7 @@ function NavigationBar() {
     <Navbar bg="primary" variant="dark">
       <Container>
         <Navbar.Brand className="fw-bold" as={Link} to={`/`}>
-          Postagram
+          LDAP face
         </Navbar.Brand>
         <Navbar.Collapse className="justify-content-end">
           <Nav>
