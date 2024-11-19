@@ -2,10 +2,11 @@ import ast
 import json
 
 import ldap3
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from flask_cors import cross_origin
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
 
+from cache_config import cache
 from load_env import env_config
 
 bp = Blueprint("auth", __name__)
@@ -24,20 +25,20 @@ def authenticate():
     if request.method == 'OPTIONS':
         return 200
     data = request.json
+    print("1")
     server = ldap3.Server(host=env_config.get('LDAP_HOST'), port=int(env_config.get('LDAP_PORT')))
+    print("2")
     conn = ldap3.Connection(server=server, user=data['username'], password=data['password'])
+    print("3")
     conn.bind()
+    print("4")
     if conn.bound:
-        search_base = 'ou=people,dc=new-world,dc=group'
-        search_filter = '(objectClass=inetOrgPerson)'
-        # search_filter = '(&(mail=john.doe@somecompany.com))'
-        attrs = ["*"]
-        result = conn.search(search_base=search_base, search_filter=search_filter, search_scope=ldap3.SUBTREE, attributes=attrs)
-        print(conn.response)
         access_token = create_access_token(identity=data['username'])
         refresh_token = create_refresh_token(identity=data['username'])
+        cache.set("current_user_" + data['username'], data)
         return jsonify({'user': data['username'], 'access': access_token, 'refresh': refresh_token}), 200
     else:
+        cache.delete("current_user_" + data['username'])
         return jsonify({'message': 'Error'}), 500
 
 
@@ -54,5 +55,7 @@ def refresh():
 @cross_origin()
 @jwt_required()
 def user_logout():
+    current_user = get_jwt_identity()
+    cache.delete("current_user_" + current_user)
     return jsonify({'message': "success"}), 204
 
