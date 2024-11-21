@@ -45,7 +45,7 @@ function useUserActions() {
   // Logout the user
   function logout() {
     return axiosService
-      .post(`${baseURL}/auth/logout/`, { refresh: getRefreshToken() })
+      .post(`${baseURL}/auth/logout/`, { refresh: getRefreshToken(), user: getUser()})
       .then(() => {
         localStorage.removeItem("auth");
         navigate("/login");
@@ -72,7 +72,11 @@ function getAccessToken() {
 // Get the refresh token
 function getRefreshToken() {
   const auth = JSON.parse(localStorage.getItem("auth"));
-  return auth.refresh;
+  if (auth) {
+    return auth.refresh;
+  } else {
+    return null;
+  }
 }
 
 // Set the access, token and user property
